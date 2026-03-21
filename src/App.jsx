@@ -10,14 +10,14 @@ import {
   Plus, X, Trash2, Timer, Settings, Upload, Lock, Unlock 
 } from 'lucide-react';
 
-// --- CONFIGURAÇÃO FIREBASE (NOSSO UNIVERSO - ALISSON & RAFA) ---
+// --- USANDO O FIREBASE QUE JÁ FUNCIONA (PCP ITAMONTE) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyARLFB5em3R-VQXqte69MJlC2-zFc4KeyY",
-  authDomain: "nosso-universo-alissonrafa.firebaseapp.com",
-  projectId: "nosso-universo-alissonrafa",
-  storageBucket: "nosso-universo-alissonrafa.firebasestorage.app",
-  messagingSenderId: "988814662333",
-  appId: "1:988814662333:web:9b6ef731acddaf65d035d4"
+  apiKey: "AIzaSyCP0KtP6sL0M69wq3FpC5Tmq_IL9AtbnsY",
+  authDomain: "pcp-juncao-itamonte.firebaseapp.com",
+  projectId: "pcp-juncao-itamonte",
+  storageBucket: "pcp-juncao-itamonte.firebasestorage.app",
+  messagingSenderId: "827442336306",
+  appId: "1:827442336306:web:653270dc35677b6273e22b"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,7 +36,6 @@ const INITIAL_REASONS = [
 ];
 
 // --- Componentes Auxiliares ---
-
 const FloatingHearts = () => {
   const [hearts, setHearts] = useState([]);
   useEffect(() => {
@@ -48,14 +47,11 @@ const FloatingHearts = () => {
     }, 800);
     return () => clearInterval(interval);
   }, []);
-
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {hearts.map((heart) => (
         <div key={heart.id} className="absolute bottom-[-50px] text-rose-400 opacity-40"
-          style={{ left: heart.left, fontSize: heart.size, animation: `floatUp ${heart.duration} linear forwards` }}>
-          ❤️
-        </div>
+          style={{ left: heart.left, fontSize: heart.size, animation: `floatUp ${heart.duration} linear forwards` }}>❤️</div>
       ))}
       <style>{`@keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }`}</style>
     </div>
@@ -79,12 +75,9 @@ const FutureItem = ({ item, onDelete }) => {
     }, 1000);
     return () => clearInterval(timer);
   }, [item.targetDate]);
-
   return (
     <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-rose-50 relative">
-      <button onClick={() => onDelete(item.id)} className="absolute top-4 right-4 text-rose-200 hover:text-rose-500">
-        <Trash2 size={16} />
-      </button>
+      <button onClick={() => onDelete(item.id)} className="absolute top-4 right-4 text-rose-200 hover:text-rose-500"><Trash2 size={16} /></button>
       <h3 className="text-rose-600 font-black uppercase text-xs tracking-wider mb-4 pr-6">{item.title}</h3>
       <div className="grid grid-cols-4 gap-2">
         <div className="text-center"><span className="block text-xl font-black text-slate-700">{timeLeft.d}</span><span className="text-[8px] uppercase text-slate-400 font-bold">Dias</span></div>
@@ -102,13 +95,11 @@ export default function App() {
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState(false);
   const [page, setPage] = useState('home');
-
   const [profileImage, setProfileImage] = useState(null);
   const [reasons, setReasons] = useState(INITIAL_REASONS);
   const [moments, setMoments] = useState([]);
   const [futures, setFutures] = useState([]);
   const [timeData, setTimeData] = useState({ months: 0, days: 0, totalDays: 0, hours: 0, minutes: 0, seconds: 0, progress: 0 });
-
   const [activeReason, setActiveReason] = useState(0);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isAddingReason, setIsAddingReason] = useState(false);
@@ -117,7 +108,6 @@ export default function App() {
   const [momentForm, setMomentForm] = useState({ title: "", desc: "", image: null });
   const [futureForm, setFutureForm] = useState({ title: "", date: "" });
   const [newReasonText, setNewReasonText] = useState("");
-
   const profileFileRef = useRef(null);
   const momentFileRef = useRef(null);
 
@@ -129,10 +119,11 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
-    const unsubProfile = onSnapshot(doc(db, 'settings', 'profile'), (d) => d.exists() && setProfileImage(d.data().image));
-    const unsubReasons = onSnapshot(doc(db, 'settings', 'reasons'), (d) => d.exists() && setReasons(d.data().list));
-    const unsubMoments = onSnapshot(collection(db, 'moments'), (s) => setMoments(s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.createdAt - a.createdAt)));
-    const unsubFuture = onSnapshot(collection(db, 'future'), (s) => setFutures(s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(a.targetDate) - new Date(b.targetDate))));
+    // Usando pastas "romance_" para não misturar com PCP
+    const unsubProfile = onSnapshot(doc(db, 'settings', 'romance_profile'), (d) => d.exists() && setProfileImage(d.data().image));
+    const unsubReasons = onSnapshot(doc(db, 'settings', 'romance_reasons'), (d) => d.exists() && setReasons(d.data().list));
+    const unsubMoments = onSnapshot(collection(db, 'romance_moments'), (s) => setMoments(s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.createdAt - a.createdAt)));
+    const unsubFuture = onSnapshot(collection(db, 'romance_future'), (s) => setFutures(s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(a.targetDate) - new Date(b.targetDate))));
     return () => { unsubProfile(); unsubReasons(); unsubMoments(); unsubFuture(); };
   }, [user]);
 
@@ -172,7 +163,7 @@ export default function App() {
     reader.onloadend = async () => {
       const base64 = reader.result;
       if (target === 'profile') {
-        await setDoc(doc(db, 'settings', 'profile'), { image: base64 });
+        await setDoc(doc(db, 'settings', 'romance_profile'), { image: base64 });
         setIsEditingProfile(false);
       } else setMomentForm({ ...momentForm, image: base64 });
     };
@@ -182,33 +173,32 @@ export default function App() {
   const saveNewReason = async () => {
     if (!newReasonText.trim()) return;
     const newList = [...reasons, newReasonText];
-    await setDoc(doc(db, 'settings', 'reasons'), { list: newList });
+    await setDoc(doc(db, 'settings', 'romance_reasons'), { list: newList });
     setNewReasonText(""); setIsAddingReason(false); setActiveReason(newList.length - 1);
   };
 
   const saveMoment = async () => {
     if (!momentForm.title.trim()) return;
-    await addDoc(collection(db, 'moments'), { ...momentForm, createdAt: Date.now(), date: new Date().toLocaleDateString('pt-BR') });
+    await addDoc(collection(db, 'romance_moments'), { ...momentForm, createdAt: Date.now(), date: new Date().toLocaleDateString('pt-BR') });
     setMomentForm({ title: "", desc: "", image: null }); setIsAddingMoment(false);
   };
 
   const saveFuture = async () => {
     if (!futureForm.title.trim() || !futureForm.date) return;
-    await addDoc(collection(db, 'future'), { title: futureForm.title, targetDate: futureForm.date });
+    await addDoc(collection(db, 'romance_future'), { title: futureForm.title, targetDate: futureForm.date });
     setFutureForm({ title: "", date: "" }); setIsAddingFuture(false);
   };
 
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
         <FloatingHearts />
         <div className="relative z-10 w-full max-w-sm">
           <div className="mb-8 bg-white p-6 rounded-full shadow-xl border border-rose-50 animate-bounce inline-block text-rose-500"><Lock size={48} /></div>
           <h1 className="text-3xl font-black text-rose-600 mb-2">Nosso Universo</h1>
-          <p className="text-slate-400 text-sm mb-8 font-medium italic">Insira a nossa data especial para entrar</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <input type="password" placeholder="Qual é a senha?" className={`w-full bg-rose-50/30 px-6 py-4 rounded-3xl text-center font-bold tracking-[0.3em] outline-none border transition-all ${authError ? 'border-rose-500' : 'border-rose-100'}`} value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
-            <button type="submit" className="w-full bg-rose-500 text-white font-black py-4 rounded-3xl shadow-lg flex items-center justify-center gap-3 uppercase text-xs tracking-widest active:scale-95 transition-all">Entrar <Unlock size={18} /></button>
+            <button type="submit" className="w-full bg-rose-500 text-white font-black py-4 rounded-3xl shadow-lg uppercase text-xs">Entrar</button>
           </form>
         </div>
       </div>
@@ -216,58 +206,42 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans selection:bg-rose-100 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-800 font-sans overflow-x-hidden">
       <FloatingHearts />
       <input type="file" accept="image/*" ref={profileFileRef} className="hidden" onChange={(e) => uploadPhoto(e, 'profile')} />
       <input type="file" accept="image/*" ref={momentFileRef} className="hidden" onChange={(e) => uploadPhoto(e, 'moment')} />
-
-      <button onClick={() => setIsEditingProfile(!isEditingProfile)} className="fixed top-6 right-6 z-50 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg text-rose-300 border border-rose-50 hover:text-rose-500 transition-all"><Settings size={20} /></button>
+      <button onClick={() => setIsEditingProfile(!isEditingProfile)} className="fixed top-6 right-6 z-50 p-3 bg-white/80 rounded-full shadow-lg text-rose-300 border border-rose-50"><Settings size={20} /></button>
 
       {isEditingProfile && (
         <div className="fixed inset-0 z-[60] flex items-start justify-center pt-24 px-6 bg-black/10 backdrop-blur-sm">
           <div className="w-full max-w-xs bg-white p-6 rounded-[2.5rem] shadow-2xl border border-rose-50">
-            <div className="flex justify-between items-center mb-4"><span className="text-rose-500 font-black text-xs uppercase tracking-widest">Definições</span><X className="cursor-pointer text-slate-300 hover:text-rose-500" onClick={() => setIsEditingProfile(false)} /></div>
-            <button onClick={() => profileFileRef.current.click()} className="w-full flex items-center justify-center gap-2 bg-rose-50 text-rose-500 py-3 rounded-xl text-[10px] font-black uppercase border border-rose-100">
-              <Upload size={14} /> Trocar Foto
-            </button>
+            <button onClick={() => profileFileRef.current.click()} className="w-full bg-rose-50 text-rose-500 py-3 rounded-xl text-[10px] font-black uppercase">Trocar Foto</button>
           </div>
         </div>
       )}
 
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-5 py-3 rounded-full shadow-2xl border border-rose-50 flex items-center gap-6 z-50">
-        <button onClick={() => setPage('home')} className={`transition-all ${page === 'home' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Heart size={22} fill={page === 'home' ? "currentColor" : "none"} /></button>
-        <button onClick={() => setPage('reasons')} className={`transition-all ${page === 'reasons' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Star size={22} fill={page === 'reasons' ? "currentColor" : "none"} /></button>
-        <button onClick={() => setPage('moments')} className={`transition-all ${page === 'moments' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Camera size={22} fill={page === 'moments' ? "currentColor" : "none"} /></button>
-        <button onClick={() => setPage('future')} className={`transition-all ${page === 'future' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Timer size={22} fill={page === 'future' ? "currentColor" : "none"} /></button>
+        <button onClick={() => setPage('home')} className={`${page === 'home' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Heart size={22} fill={page === 'home' ? "currentColor" : "none"} /></button>
+        <button onClick={() => setPage('reasons')} className={`${page === 'reasons' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Star size={22} fill={page === 'reasons' ? "currentColor" : "none"} /></button>
+        <button onClick={() => setPage('moments')} className={`${page === 'moments' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Camera size={22} fill={page === 'moments' ? "currentColor" : "none"} /></button>
+        <button onClick={() => setPage('future')} className={`${page === 'future' ? 'text-rose-500 scale-125' : 'text-slate-400'}`}><Timer size={22} fill={page === 'future' ? "currentColor" : "none"} /></button>
       </nav>
 
       <main className="max-w-md mx-auto px-6 pt-12 pb-24 min-h-screen flex flex-col items-center justify-center text-center">
         {page === 'home' && (
           <div className="w-full animate-in fade-in duration-700">
             <div className="relative inline-block mb-6">
-              <div className="absolute inset-0 bg-rose-400 blur-3xl opacity-10 animate-pulse rounded-full"></div>
               <div className="relative bg-white p-3 rounded-full shadow-sm border border-rose-50 w-32 h-32 flex items-center justify-center overflow-hidden">
                 {profileImage ? <img src={profileImage} className="w-full h-full object-cover rounded-full" /> : <Heart size={64} className="text-rose-500" fill="currentColor" />}
               </div>
             </div>
             <h1 className="text-4xl font-black text-rose-600 mb-2">Nosso tempo juntos</h1>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-rose-50 rounded-full text-rose-500 text-xs font-bold uppercase tracking-wider mb-8">
-              <Calendar size={14} /> <span>{timeData.totalDays} dias de história</span>
-            </div>
             <div className="space-y-4 mb-8 w-full">
               <div className="bg-white p-6 rounded-[2.5rem] shadow-lg border border-rose-100">
                 <div className="grid grid-cols-2 gap-4 divide-x divide-rose-50">
                   <div><span className="block text-5xl font-black text-rose-500">{timeData.months}</span><span className="text-xs font-bold text-rose-300 uppercase">meses</span></div>
                   <div><span className="block text-5xl font-black text-slate-700">{timeData.days}</span><span className="text-xs font-bold text-slate-400 uppercase">dias</span></div>
                 </div>
-                <div className="mt-8 w-full h-2 bg-rose-50 rounded-full overflow-hidden border border-rose-50">
-                  <div className="h-full bg-rose-500 transition-all duration-1000" style={{ width: `${timeData.progress}%` }} />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white p-3 rounded-2xl border border-rose-50"><span className="block text-xl font-black text-rose-400">{timeData.hours}</span><span className="text-[9px] uppercase font-bold text-slate-400">Horas</span></div>
-                <div className="bg-white p-3 rounded-2xl border border-rose-50"><span className="block text-xl font-black text-rose-400">{timeData.minutes}</span><span className="text-[9px] uppercase font-bold text-slate-400">Mins</span></div>
-                <div className="bg-white p-3 rounded-2xl border border-rose-50"><span className="block text-xl font-black text-rose-400">{timeData.seconds}</span><span className="text-[9px] uppercase font-bold text-slate-400">Segs</span></div>
               </div>
             </div>
             <div className="opacity-50 text-rose-400 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2">
@@ -278,43 +252,41 @@ export default function App() {
 
         {page === 'reasons' && (
           <div className="w-full animate-in slide-in-from-right duration-500">
-            <div className="flex justify-between items-center mb-8"><h2 className="text-3xl font-black text-rose-600">Porque te amo?</h2><button onClick={() => setIsAddingReason(!isAddingReason)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg">{isAddingReason ? <X size={18} /> : <Plus size={18} />}</button></div>
+            <div className="flex justify-between items-center mb-8"><h2 className="text-3xl font-black text-rose-600">Porque te amo?</h2><button onClick={() => setIsAddingReason(!isAddingReason)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg"><Plus size={18} /></button></div>
             {isAddingReason && (
-              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left animate-in slide-in-from-top">
+              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left">
                 <textarea className="w-full p-3 rounded-xl text-sm outline-none mb-3 h-24" placeholder="Novo motivo..." value={newReasonText} onChange={e => setNewReasonText(e.target.value)} />
-                <button onClick={saveNewReason} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs uppercase tracking-widest">Salvar</button>
+                <button onClick={saveNewReason} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs uppercase">Salvar</button>
               </div>
             )}
-            <div className="bg-white rounded-[3rem] shadow-2xl border border-rose-100 p-10 mb-8 min-h-[220px] flex items-center justify-center italic">
-              <p className="text-xl font-bold text-slate-700">"{reasons[activeReason] || "..."}"</p>
-            </div>
-            <button onClick={() => setActiveReason((activeReason + 1) % reasons.length)} className="bg-rose-500 text-white px-10 py-4 rounded-full font-black shadow-lg flex items-center gap-3 uppercase text-xs mx-auto">Próximo motivo <ChevronRight size={18} /></button>
+            <div className="bg-white rounded-[3rem] shadow-2xl border border-rose-100 p-10 mb-8 min-h-[220px] flex items-center justify-center italic"><p className="text-xl font-bold text-slate-700">"{reasons[activeReason]}"</p></div>
+            <button onClick={() => setActiveReason((activeReason + 1) % reasons.length)} className="bg-rose-500 text-white px-10 py-4 rounded-full font-black shadow-lg uppercase text-xs mx-auto">Próximo</button>
           </div>
         )}
 
         {page === 'moments' && (
           <div className="w-full flex flex-col max-h-[75vh] animate-in slide-in-from-left duration-500">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-3xl font-black text-rose-600">Momentos</h2><button onClick={() => setIsAddingMoment(!isAddingMoment)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg">{isAddingMoment ? <X size={18} /> : <Plus size={18} />}</button></div>
+            <div className="flex justify-between items-center mb-6"><h2 className="text-3xl font-black text-rose-600">Momentos</h2><button onClick={() => setIsAddingMoment(!isAddingMoment)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg"><Plus size={18} /></button></div>
             {isAddingMoment && (
-              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left animate-in slide-in-from-top">
+              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left">
                 <div onClick={() => momentFileRef.current.click()} className="aspect-video bg-white rounded-xl border-2 border-dashed border-rose-200 mb-3 flex flex-col items-center justify-center cursor-pointer overflow-hidden text-rose-300">
-                  {momentForm.image ? <img src={momentForm.image} className="w-full h-full object-cover" /> : <><Camera size={32} /><span className="text-[10px] font-bold mt-2 uppercase tracking-widest">Escolher Foto</span></>}
+                  {momentForm.image ? <img src={momentForm.image} className="w-full h-full object-cover" /> : <Camera size={32} />}
                 </div>
                 <input placeholder="Título" className="w-full p-2 rounded-lg mb-2 text-sm outline-none" value={momentForm.title} onChange={e => setMomentForm({...momentForm, title: e.target.value})} />
                 <textarea placeholder="História" className="w-full p-2 rounded-lg mb-3 text-sm outline-none h-20" value={momentForm.desc} onChange={e => setMomentForm({...momentForm, desc: e.target.value})} />
-                <button onClick={saveMoment} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs uppercase">Guardar</button>
+                <button onClick={saveMoment} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs">Guardar</button>
               </div>
             )}
             <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
               {moments.map(m => (
-                <div key={m.id} className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-rose-50 text-left relative group transition-all">
-                  <div className="aspect-video bg-rose-50 flex items-center justify-center overflow-hidden">
-                    {m.image ? <img src={m.image} className="w-full h-full object-cover" /> : <Camera className="text-rose-100" size={40} />}
-                    <button onClick={() => deleteDoc(doc(db, 'moments', m.id))} className="absolute top-4 right-4 p-2 bg-white/90 rounded-full text-rose-400 opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
+                <div key={m.id} className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-rose-50 text-left relative group">
+                  <div className="aspect-video overflow-hidden">
+                    {m.image && <img src={m.image} className="w-full h-full object-cover" />}
+                    <button onClick={() => deleteDoc(doc(db, 'romance_moments', m.id))} className="absolute top-4 right-4 p-2 bg-white/90 rounded-full text-rose-400 opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
                   </div>
                   <div className="p-5">
-                    <div className="flex justify-between items-center mb-1"><h3 className="font-black text-slate-700 uppercase text-xs tracking-wider">{m.title}</h3><span className="text-[9px] font-bold text-rose-300">{m.date}</span></div>
-                    <p className="text-xs text-slate-400 leading-relaxed">{m.desc}</p>
+                    <div className="flex justify-between items-center mb-1"><h3 className="font-black text-slate-700 uppercase text-xs">{m.title}</h3></div>
+                    <p className="text-xs text-slate-400">{m.desc}</p>
                   </div>
                 </div>
               ))}
@@ -324,27 +296,24 @@ export default function App() {
 
         {page === 'future' && (
           <div className="w-full flex flex-col max-h-[75vh] animate-in slide-in-from-bottom duration-500">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-3xl font-black text-rose-600">Futuro</h2><button onClick={() => setIsAddingFuture(!isAddingFuture)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg">{isAddingFuture ? <X size={18} /> : <Plus size={18} />}</button></div>
+            <div className="flex justify-between items-center mb-6"><h2 className="text-3xl font-black text-rose-600">Futuro</h2><button onClick={() => setIsAddingFuture(!isAddingFuture)} className="p-2 bg-rose-500 text-white rounded-full shadow-lg"><Plus size={18} /></button></div>
             {isAddingFuture && (
-              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left animate-in slide-in-from-top">
+              <div className="mb-6 bg-rose-50 p-4 rounded-3xl border border-rose-100 text-left">
                 <input placeholder="Sonho..." className="w-full p-2 rounded-lg mb-2 text-sm outline-none" value={futureForm.title} onChange={e => setFutureForm({...futureForm, title: e.target.value})} />
                 <input type="datetime-local" className="w-full p-2 rounded-lg mb-3 text-sm outline-none" value={futureForm.date} onChange={e => setFutureForm({...futureForm, date: e.target.value})} />
-                <button onClick={saveFuture} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs uppercase tracking-widest">Agendar</button>
+                <button onClick={saveFuture} className="w-full bg-rose-500 text-white font-black py-2 rounded-xl text-xs">Agendar</button>
               </div>
             )}
             <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
               {futures.map(f => (
-                <FutureItem key={f.id} item={f} onDelete={(id) => deleteDoc(doc(db, 'future', id))} />
+                <FutureItem key={f.id} item={f} onDelete={(id) => deleteDoc(doc(db, 'romance_future', id))} />
               ))}
             </div>
           </div>
         )}
       </main>
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fecaca; border-radius: 10px; }
-      `}</style>
+      <style>{`.custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #fecaca; border-radius: 10px; }`}</style>
     </div>
   );
 }
